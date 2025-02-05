@@ -1,31 +1,39 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchShowDetails } from "../api/tvmazeApi";
+import { useEffect, useState } from "react";
 
 const ShowDetails = () => {
   const { id } = useParams();
   const [show, setShow] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadShow = async () => {
-      const data = await fetchShowDetails(id);
-      setShow(data);
-      setLoading(false);
-    };
-    loadShow();
+    fetch(`https://api.tvmaze.com/shows/${id}`)
+      .then((res) => res.json())
+      .then((data) => setShow(data));
   }, [id]);
 
-  if (loading) return <p className="text-center">Loading...</p>;
+  if (!show) return <p className="text-center text-gray-500">Loading...</p>;
 
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-3xl font-bold">{show.name}</h1>
-      <img src={show.image?.original || "https://via.placeholder.com/400"} alt={show.name} className="w-full max-w-lg mx-auto my-4" />
-      <p className="text-lg"><strong>Genres:</strong> {show.genres.join(", ")}</p>
-      <p className="text-lg"><strong>Runtime:</strong> {show.runtime} mins</p>
-      <p className="text-lg"><strong>Summary:</strong></p>
-      <div dangerouslySetInnerHTML={{ __html: show.summary }} className="text-md"></div>
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
+      <img
+        src={show.image?.original || "https://via.placeholder.com/400"}
+        alt={show.name}
+        className="w-full h-96 object-cover rounded-md"
+      />
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mt-4">{show.name}</h1>
+      <p className="text-gray-600 dark:text-gray-300 mt-2">{show.genres?.join(", ")}</p>
+      <div
+        className="mt-4 text-gray-700 dark:text-gray-400"
+        dangerouslySetInnerHTML={{ __html: show.summary }}
+      />
+      <a
+        href={show.officialSite}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block mt-4 text-blue-600 dark:text-blue-400 hover:underline"
+      >
+        Official Site →
+      </a>
     </div>
   );
 };

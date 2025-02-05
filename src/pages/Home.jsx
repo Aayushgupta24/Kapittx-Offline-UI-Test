@@ -1,32 +1,25 @@
 import { useEffect, useState } from "react";
-import { fetchTVSchedule } from "../api/tvmazeApi";
 import ShowCard from "../components/ShowCard";
 
 const Home = () => {
   const [shows, setShows] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadShows = async () => {
-      const data = await fetchTVSchedule();
-      setShows(data);
-      setLoading(false);
-    };
-    loadShows();
+    fetch("https://api.tvmaze.com/schedule?country=US&date=2024-02-04")
+      .then((res) => res.json())
+      .then((data) => setShows(data));
   }, []);
 
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-3xl font-bold text-center mb-6">TV Schedule</h1>
-      {loading ? (
-        <p className="text-center">Loading...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {shows.map((show) => (
-            <ShowCard key={show.id} show={show} />
-          ))}
-        </div>
-      )}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-8">
+        TV Schedule (US)
+      </h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {shows.map((show) => (
+          <ShowCard key={show.id} show={show} />
+        ))}
+      </div>
     </div>
   );
 };
